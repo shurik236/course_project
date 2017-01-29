@@ -1,18 +1,17 @@
 import org.jfree.data.xy.XYSeries;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 
 public class Calculator {
 
 	private double timeInit = 0;
-	private double timeEnd = 100;
+	private double timeEnd = 50;
 	private double delta = 0.01;
 	private double aParam;
 	private double bParam;
+	private BiFunction<Double, Double, Double> xInstability = (x, y) -> InstabilityModel.xInstability(x, y);
+	private BiFunction<Double, Double, Double> yInstability = (x, y) -> InstabilityModel.yInstability(x, y);
 	
 	public Calculator(double timeSpan, double delta, double aParam, double bParam) {
 		this.timeEnd = timeSpan;
@@ -28,6 +27,14 @@ public class Calculator {
 			throw new IllegalArgumentException("Parameters should be positive real numbers!");
 		this.aParam = aParam;
 		this.bParam = bParam;
+	}
+
+	private void setXInstability(BiFunction<Double, Double, Double> func){
+		this.xInstability = func;
+	}
+
+	private void setYInstability(BiFunction<Double, Double, Double> func){
+		this.yInstability = func;
 	}
 
 	private BiFunction<Double, Double, Double> makeXAsOfTime() {
@@ -61,9 +68,12 @@ public class Calculator {
 			correctedY = currentY + l3/2.0;
 			double k4 = delta * xAsOfTime.apply(correctedX, correctedY);
 			double l4 = delta * yAsOfTime.apply(correctedX, correctedY);
-			
-			double xNext = (currentX + (k1 + k2 + k3 + k4)/6.0);
-			double yNext = (currentY + (l1 + l2 + l3 + l4)/6.0);
+
+			InstabilityModel.nextRandomParameters();
+			double xNext = (currentX + (k1 + k2 + k3 + k4)/6.0) +
+					xInstability.apply(currentX, currentY)*Math.sqrt(delta);
+			double yNext = (currentY + (l1 + l2 + l3 + l4)/6.0) +
+					yInstability.apply(currentX, currentY)*Math.sqrt(delta);
 
 			outputGraph.add(xNext, yNext);
 			currentX = xNext;
