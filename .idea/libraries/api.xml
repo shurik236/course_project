@@ -6,6 +6,8 @@
     </JAVADOC>
     <SOURCES>
       <root url="jar://$USER_HOME$/Downloads/colt-1.2.0.zip!/colt/src" />
+      <root url="jar://$USER_HOME$/Desktop/spacial/FFT_1.1.zip!/FFT" />
+      <root url="jar://$USER_HOME$/Desktop/spacial/FFT_1.1.zip!/FFT/src" />
     </SOURCES>
   </library>
 </component>
